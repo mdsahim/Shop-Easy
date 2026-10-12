@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Order History – ShopEasy{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-extrabold mb-1 d-flex align-items-center gap-2">
+        <i class="bi bi-box-seam text-primary"></i> My Orders
+      </h2>
+      <p class="text-muted mb-0">Track and view invoices for all your past purchases.</p>
+    </div>
+    <a href="{% url 'product_list' %}" class="btn btn-outline-primary rounded-pill px-4">
+      <i class="bi bi-cart me-1"></i> Shop More
+    </a>
+  </div>
+
+  {% if orders %}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light">
+            <tr class="small text-uppercase text-muted">
+              <th class="ps-4">Order Reference</th>
+              <th>Date Placed</th>
+              <th>Items</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th class="text-end pe-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+              <tr>
+                <!-- Order Reference -->
+                <td class="ps-4">
+                  <a href="{% url 'order_detail' order.order_number %}" class="fw-bold text-primary text-decoration-none">
+                    {{ order.order_number }}
+                  </a>
+                </td>
+
+                <!-- Date -->
+                <td class="text-muted small">
+                  {{ order.created_at|date:"M d, Y" }}
+                  <div class="text-muted" style="font-size: 0.75rem;">{{ order.created_at|time:"H:i" }}</div>
+                </td>
+
+                <!-- Items Count -->
+                <td>
+                  <span class="badge bg-light text-dark border">
+                    {{ order.items_count }} item{{ order.items_count|pluralize }}
+                  </span>
+                </td>
+
+                <!-- Total Amount -->
+                <td class="fw-bold text-dark">
+                  ${{ order.total_amount }}
+                </td>
+
+                <!-- Status Badge -->
+                <td>
+                  {% if order.status == 'DELIVERED' %}
+                    <span class="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill">Delivered</span>
+                  {% elif order.status == 'SHIPPED' %}
+                    <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill">Shipped</span>
+                  {% elif order.status == 'PROCESSING' %}
+                    <span class="badge bg-info-subtle text-info-emphasis fw-bold px-3 py-2 rounded-pill">Processing</span>
+                  {% elif order.status == 'CANCELLED' %}
+                    <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-2 rounded-pill">Cancelled</span>
+                  {% else %}
+                    <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-3 py-2 rounded-pill">Pending</span>
+                  {% endif %}
+                </td>
+
+                <!-- Payment Info -->
+                <td>
+                  <span class="small text-muted">{{ order.payment_method }}</span>
+                </td>
+
+                <!-- Action Button -->
+                <td class="text-end pe-4">
+                  <a href="{% url 'order_detail' order.order_number %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    View Details
+                  </a>
+                </td>
+
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  {% else %}
+    <!-- Empty State -->
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4 bg-white">
+      <div class="mb-3">
+        <i class="bi bi-box2 text-muted" style="font-size: 3.5rem;"></i>
+      </div>
+      <h4 class="fw-bold mb-2">You haven't placed any orders yet</h4>
+      <p class="text-muted max-w-md mx-auto mb-4">
+        Discover top tech gear, smart watches, headphones, and more with nationwide Cash on Delivery.
+      </p>
+      <div>
+        <a href="{% url 'product_list' %}" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold">
+          Explore Products Now
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

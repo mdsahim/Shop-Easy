@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart ({{ cart_item_count }} items) – ShopEasy{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <h2 class="fw-extrabold mb-4 d-flex align-items-center gap-2">
+    <i class="bi bi-cart3 text-primary"></i> Shopping Cart
+  </h2>
+
+  {% if cart %}
+    <div class="row g-4">
+      
+      <!-- Cart Items Table Column -->
+      <div class="col-lg-8">
+        
+        <!-- Free Shipping Banner Notice -->
+        <div class="p-3 mb-3 bg-primary-subtle text-primary-emphasis rounded-3 border border-primary-subtle d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-truck fs-5"></i>
+            {% if cart.get_subtotal >= 50 %}
+              <span class="fw-semibold">Congratulations! You've qualified for <strong>FREE Delivery</strong>!</span>
+            {% else %}
+              <span>Add <strong>${{ 50|floatformat:2|add:"-0" }}</strong> threshold: You're just a little away from <strong>FREE Delivery</strong>!</span>
+            {% endif %}
+          </div>
+          <span class="badge bg-primary text-white rounded-pill px-3 py-1">Express Shipping</span>
+        </div>
+
+        <div class="cart-table-wrapper mb-3">
+          <table class="table cart-table align-middle">
+            <thead>
+              <tr>
+                <th scope="col" style="width: 45%;">Product</th>
+                <th scope="col" class="text-center">Price</th>
+                <th scope="col" class="text-center" style="width: 150px;">Quantity</th>
+                <th scope="col" class="text-end">Total</th>
+                <th scope="col" class="text-center" style="width: 50px;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart %}
+                <tr class="cart-item-row" data-product-id="{{ item.product.id }}">
+                  
+                  <!-- Product thumbnail & title -->
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <a href="{% url 'product_detail' item.product.slug %}">
+                        <img 
+                          src="{{ item.product.get_image_url }}" 
+                          alt="{{ item.product.name }}" 
+                          class="cart-product-thumb"
+                        >
+                      </a>
+                      <div>
+                        <a href="{% url 'product_detail' item.product.slug %}" class="fw-bold text-dark text-decoration-none d-block">
+                          {{ item.product.name }}
+                        </a>
+                        <span class="small text-muted">{{ item.product.category.name }}</span>
+                        <div class="small text-success">In Stock ({{ item.max_stock }} max)</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Unit Price -->
+                  <td class="text-center fw-semibold text-secondary">
+                    ${{ item.price }}
+                  </td>
+
+                  <!-- Quantity picker -->
+                  <td class="text-center">
+                    <div class="quantity-picker mx-auto">
+                      <button type="button" class="qty-btn btn-qty-dec" aria-label="Decrease quantity">&minus;</button>
+                      <input 
+                        type="number" 
+                        class="qty-input cart-qty-input" 
+                        value="{{ item.quantity }}" 
+                        min="1" 
+                        max="{{ item.max_stock }}"
+                        aria-label="Item quantity"
+                      >
+                      <button type="button" class="qty-btn btn-qty-inc" aria-label="Increase quantity">&plus;</button>
+                    </div>
+                  </td>
+
+                  <!-- Line Total -->
+                  <td class="text-end fw-extrabold text-dark item-line-total">
+                    ${{ item.total_price }}
+                  </td>
+
+                  <!-- Remove Action -->
+                  <td class="text-center">
+                    <form action="{% url 'cart_remove' item.product.id %}" method="POST" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-link text-danger p-0" title="Remove product from cart">
+                        <i class="bi bi-trash3 fs-5"></i>
+                      </button>
+                    </form>
+                  </td>
+
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer Utility Buttons -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <a href="{% url 'product_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+          </a>
+          <form action="{% url 'cart_clear' %}" method="POST" onsubmit="return confirm('Are you sure you want to clear your cart?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+              <i class="bi bi-x-circle me-1"></i> Clear Cart
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Order Summary Card Column -->
+      <div class="col-lg-4">
+        <div class="order-summary-card">
+          <h5 class="fw-bold mb-3 pb-2 border-bottom">Order Summary</h5>
+          
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span class="fw-bold text-dark" id="cartSubtotalAmount">${{ cart.get_subtotal }}</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Estimated Shipping</span>
+            <span class="fw-bold text-dark" id="cartShippingAmount">
+              {% if cart.get_shipping_cost == 0 %}
+                <span class="text-success">FREE</span>
+              {% else %}
+                ${{ cart.get_shipping_cost }}
+              {% endif %}
+            </span>
+          </div>
+
+          <div class="summary-row">
+            <span>Estimated Taxes</span>
+            <span class="text-muted">Included</span>
+          </div>
+
+          <div class="summary-row total-row">
+            <span>Grand Total</span>
+            <span class="text-primary" id="cartTotalAmount">${{ cart.get_total_price }}</span>
+          </div>
+
+          <!-- Checkout CTA Button -->
+          <div class="mt-4">
+            <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow">
+              Proceed to Checkout <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          </div>
+
+          <!-- Payment methods notice -->
+          <div class="mt-4 pt-3 border-top text-center text-muted small">
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-1 text-success fw-bold">
+              <i class="bi bi-cash-stack fs-5"></i> Cash on Delivery (COD) Supported
+            </div>
+            <div>Pay when your products arrive at your door.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  {% else %}
+    <!-- Empty Cart State -->
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-5">
+      <div class="mb-3">
+        <div class="p-4 bg-light rounded-circle d-inline-flex">
+          <i class="bi bi-cart-x text-muted" style="font-size: 4rem;"></i>
+        </div>
+      </div>
+      <h3 class="fw-bold mb-2">Your Shopping Cart is Empty</h3>
+      <p class="text-muted max-w-md mx-auto mb-4">
+        Looks like you haven't added any products to your cart yet. Explore our premier collection of electronics, gadgets, and audio gear!
+      </p>
+      <div>
+        <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">
+          <i class="bi bi-bag-plus me-2"></i> Start Shopping
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

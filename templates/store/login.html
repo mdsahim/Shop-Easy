@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Log In to Your Account – ShopEasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      
+      <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+        
+        <!-- Header -->
+        <div class="text-center mb-4">
+          <div class="brand-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+            <i class="bi bi-bag-heart-fill"></i>
+          </div>
+          <h3 class="fw-bold text-dark mb-1">Welcome Back</h3>
+          <p class="text-muted small">Log in to view your orders and track deliveries.</p>
+        </div>
+
+        <!-- Login Form -->
+        <form method="POST" action="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger rounded-3 py-2 px-3 small mb-3">
+              {{ form.non_field_errors|first }}
+            </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <div class="text-danger small mt-1">{{ form.username.errors|first }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+            </div>
+            {{ form.password }}
+            {% if form.password.errors %}
+              <div class="text-danger small mt-1">{{ form.password.errors|first }}</div>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-2 shadow-sm mb-3">
+            Sign In
+          </button>
+
+          <div class="text-center text-muted small">
+            Don't have an account? 
+            <a href="{% url 'register' %}" class="fw-bold text-primary text-decoration-none">Create an Account</a>
+          </div>
+
+        </form>
+
+        <!-- Demo Account Credentials Box -->
+        <div class="mt-4 p-3 bg-light rounded-3 border">
+          <div class="small fw-bold text-dark mb-1">
+            <i class="bi bi-key-fill text-warning me-1"></i> Quick Demo Logins:
+          </div>
+          <div class="small text-muted font-monospace">
+            Customer: <strong>customer</strong> / <strong>customer123</strong><br>
+            Administrator: <strong>admin</strong> / <strong>admin123</strong>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

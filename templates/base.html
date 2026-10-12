@@ -1,0 +1,276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ShopEasy – Modern Online Shopping Store{% endblock %}</title>
+  <meta name="description" content="ShopEasy - Discover modern electronics, gadgets, audio gear, and accessories with Cash on Delivery and fast shipping.">
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- ShopEasy Custom Stylesheet -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-announcement-bar text-center">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span class="d-none d-md-inline"><i class="bi bi-shield-check me-1"></i> 100% Genuine Products & Guaranteed Satisfaction</span>
+      <span><i class="bi bi-truck me-1"></i> Free Shipping on orders over $50 | <strong>Cash on Delivery Available</strong></span>
+      <span class="d-none d-md-inline"><i class="bi bi-headset me-1"></i> 24/7 Support: support@shopeasy.com</span>
+    </div>
+  </div>
+
+  <!-- Primary Navigation Bar -->
+  <header class="navbar-shopeasy">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between w-100 gap-3">
+        
+        <!-- Brand Logo -->
+        <a class="brand-logo" href="{% url 'home' %}">
+          <span class="brand-icon"><i class="bi bi-bag-heart-fill"></i></span>
+          <span>Shop<span class="brand-accent">Easy</span></span>
+        </a>
+
+        <!-- Desktop Navigation Search Form -->
+        <form class="nav-search-form d-none d-lg-block" action="{% url 'product_list' %}" method="GET">
+          <input 
+            type="text" 
+            name="q" 
+            class="form-control nav-search-input" 
+            placeholder="Search products, brands, electronics..." 
+            value="{{ request.GET.q|default:'' }}"
+            aria-label="Search products"
+          >
+          <button type="submit" class="nav-search-btn" aria-label="Search">
+            <i class="bi bi-search"></i>
+          </button>
+        </form>
+
+        <!-- Right Header Actions -->
+        <div class="d-flex align-items-center gap-3">
+          
+          <!-- Desktop Nav Links -->
+          <nav class="d-none d-md-flex align-items-center gap-1 me-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}" href="{% url 'product_list' %}">Products</a>
+            
+            <!-- Categories Dropdown -->
+            <div class="dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Categories
+              </a>
+              <ul class="dropdown-menu shadow-lg border-0 rounded-3 mt-2">
+                {% for cat in global_categories %}
+                  <li>
+                    <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'product_list_by_category' cat.slug %}">
+                      <i class="bi {{ cat.icon }} text-primary"></i>
+                      <span>{{ cat.name }}</span>
+                    </a>
+                  </li>
+                {% empty %}
+                  <li><a class="dropdown-item text-muted" href="#">No categories</a></li>
+                {% endfor %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item fw-bold text-primary" href="{% url 'product_list' %}">All Categories &rarr;</a></li>
+              </ul>
+            </div>
+
+            <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact</a>
+          </nav>
+
+          <!-- Shopping Cart Button with Dynamic Badge -->
+          <a href="{% url 'cart_detail' %}" class="cart-button-link" title="Shopping Cart">
+            <i class="bi bi-cart3 fs-5"></i>
+            <span class="d-none d-sm-inline">Cart</span>
+            <span class="cart-badge-count {% if cart_item_count == 0 %}d-none{% endif %}" id="navCartBadge">
+              {{ cart_item_count }}
+            </span>
+          </a>
+
+          <!-- User Account Actions -->
+          {% if user.is_authenticated %}
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle fs-5 text-primary"></i>
+                <span class="fw-semibold">{{ user.first_name|default:user.username }}</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
+                <li class="px-3 py-2 border-bottom">
+                  <div class="small text-muted">Signed in as</div>
+                  <div class="fw-bold">{{ user.username }}</div>
+                </li>
+                <li>
+                  <a class="dropdown-item py-2" href="{% url 'order_history' %}">
+                    <i class="bi bi-box-seam me-2 text-primary"></i> My Orders
+                  </a>
+                </li>
+                {% if user.is_staff %}
+                  <li>
+                    <a class="dropdown-item py-2" href="/admin/" target="_blank">
+                      <i class="bi bi-speedometer2 me-2 text-warning"></i> Admin Portal
+                    </a>
+                  </li>
+                {% endif %}
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item py-2 text-danger" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                  </a>
+                </li>
+              </ul>
+            </div>
+          {% else %}
+            <div class="d-flex align-items-center gap-2">
+              <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-medium">Log In</a>
+              <a href="{% url 'register' %}" class="btn btn-primary btn-sm px-3 rounded-pill fw-medium d-none d-sm-inline-block">Sign Up</a>
+            </div>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+      <!-- Mobile Search Form -->
+      <div class="d-block d-lg-none mt-2 w-100">
+        <form class="nav-search-form" action="{% url 'product_list' %}" method="GET">
+          <input 
+            type="text" 
+            name="q" 
+            class="form-control nav-search-input" 
+            placeholder="Search products..." 
+            value="{{ request.GET.q|default:'' }}"
+          >
+          <button type="submit" class="nav-search-btn">
+            <i class="bi bi-search"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Flash Messages Banner -->
+  <div class="container mt-3">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm rounded-3 d-flex align-items-center gap-2" role="alert">
+          {% if message.tags == 'success' %}
+            <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+          {% elif message.tags == 'danger' or message.tags == 'error' %}
+            <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+          {% elif message.tags == 'warning' %}
+            <i class="bi bi-exclamation-circle-fill fs-5 text-warning"></i>
+          {% else %}
+            <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+          {% endif %}
+          <div class="flex-grow-1">{{ message }}</div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Main Application Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="footer-shopeasy">
+    <div class="container">
+      <div class="row g-4">
+        
+        <!-- Brand & Description -->
+        <div class="col-lg-4 col-md-6">
+          <a class="brand-logo text-white mb-3" href="{% url 'home' %}">
+            <span class="brand-icon"><i class="bi bi-bag-heart-fill"></i></span>
+            <span class="text-white">Shop<span class="text-primary">Easy</span></span>
+          </a>
+          <p class="text-muted pe-lg-4 mt-2">
+            Your destination for premium electronics, state-of-the-art gadgets, and daily accessories. Offering nationwide Cash on Delivery, instant order tracking, and round-the-clock customer support.
+          </p>
+          <div class="d-flex gap-3 text-white fs-5 mt-3">
+            <a href="#" class="text-muted hover-white"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="text-muted hover-white"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="text-muted hover-white"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="text-muted hover-white"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-lg-2 col-md-6 col-6">
+          <h5 class="footer-heading">Quick Links</h5>
+          <ul class="footer-links">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'product_list' %}">All Products</a></li>
+            <li><a href="{% url 'cart_detail' %}">Shopping Cart</a></li>
+            <li><a href="{% url 'order_history' %}">My Orders</a></li>
+            <li><a href="{% url 'contact' %}">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <!-- Popular Categories -->
+        <div class="col-lg-3 col-md-6 col-6">
+          <h5 class="footer-heading">Categories</h5>
+          <ul class="footer-links">
+            {% for cat in global_categories|slice:":5" %}
+              <li><a href="{% url 'product_list_by_category' cat.slug %}">{{ cat.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Customer Care & Payment -->
+        <div class="col-lg-3 col-md-6">
+          <h5 class="footer-heading">Customer Care</h5>
+          <ul class="footer-links mb-3">
+            <li><i class="bi bi-geo-alt text-primary me-2"></i> 100 Tech Park Blvd, Suite 400</li>
+            <li><i class="bi bi-telephone text-primary me-2"></i> +1 (800) 555-EASY</li>
+            <li><i class="bi bi-envelope text-primary me-2"></i> support@shopeasy.com</li>
+          </ul>
+          
+          <div class="p-3 bg-dark rounded-3 border border-secondary border-opacity-25 mt-3">
+            <div class="small text-white fw-bold mb-1"><i class="bi bi-cash-coin text-success me-1"></i> Cash on Delivery</div>
+            <div class="small text-muted">Pay securely in cash at your doorstep when your package arrives!</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <p class="mb-0 text-muted">
+          &copy; 2026 <strong>ShopEasy</strong>. All rights reserved. Crafted with Django & modern web technologies.
+        </p>
+        <div class="d-flex align-items-center gap-3 text-muted">
+          <span><i class="bi bi-shield-lock-fill text-success me-1"></i> 256-Bit SSL Secured</span>
+          <span>&bull;</span>
+          <span><i class="bi bi-arrow-repeat text-primary me-1"></i> 7-Day Easy Returns</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container-custom"></div>
+
+  <!-- Bootstrap 5.3.3 JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <!-- ShopEasy Custom Script -->
+  <script src="{% static 'js/script.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

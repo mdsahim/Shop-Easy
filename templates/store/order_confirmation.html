@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmed #{{ order.order_number }} – ShopEasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      
+      <!-- Confirmation Header Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 text-center mb-4 bg-white">
+        <div class="mb-3">
+          <div class="p-3 bg-success-subtle text-success rounded-circle d-inline-flex" style="width: 80px; height: 80px; align-items: center; justify-content: center;">
+            <i class="bi bi-check-lg display-5 fw-bold"></i>
+          </div>
+        </div>
+        
+        <h2 class="fw-extrabold text-dark mb-2">Order Successfully Placed!</h2>
+        <p class="text-muted fs-6 mb-3">
+          Thank you for choosing ShopEasy, <strong>{{ order.full_name }}</strong>. Your order has been registered and is being prepared for dispatch.
+        </p>
+
+        <div class="d-inline-flex align-items-center gap-2 bg-light border px-4 py-2 rounded-pill mx-auto">
+          <span class="text-muted small">Order Reference:</span>
+          <strong class="fs-5 text-primary">{{ order.order_number }}</strong>
+        </div>
+
+        <!-- Order Timeline Progress -->
+        <div class="mt-4 pt-3 border-top">
+          <div class="d-flex justify-content-between position-relative px-2 px-md-5">
+            <div class="text-center position-relative z-1">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 36px; height: 36px;">
+                <i class="bi bi-check"></i>
+              </div>
+              <div class="small fw-bold">Order Placed</div>
+              <div class="text-muted" style="font-size: 0.75rem;">Today</div>
+            </div>
+
+            <div class="text-center position-relative z-1">
+              <div class="rounded-circle bg-light border text-muted d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 36px; height: 36px;">
+                <i class="bi bi-box-seam"></i>
+              </div>
+              <div class="small text-muted">Processing</div>
+            </div>
+
+            <div class="text-center position-relative z-1">
+              <div class="rounded-circle bg-light border text-muted d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 36px; height: 36px;">
+                <i class="bi bi-truck"></i>
+              </div>
+              <div class="small text-muted">Shipped</div>
+            </div>
+
+            <div class="text-center position-relative z-1">
+              <div class="rounded-circle bg-light border text-muted d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 36px; height: 36px;">
+                <i class="bi bi-house-door"></i>
+              </div>
+              <div class="small text-muted">Delivered</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Order Details Grid -->
+      <div class="row g-4 mb-4">
+        
+        <!-- Shipping Destination -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-geo-alt-fill text-danger"></i> Shipping Address
+            </h5>
+            <div class="fw-semibold text-dark">{{ order.full_name }}</div>
+            <div class="text-muted mb-2">{{ order.address }}</div>
+            <div class="text-muted mb-2">{{ order.city }}, {{ order.state }} - {{ order.postal_code }}</div>
+            <div class="small text-muted mt-auto pt-2 border-top">
+              <div><i class="bi bi-envelope me-1"></i> {{ order.email }}</div>
+              <div><i class="bi bi-telephone me-1"></i> {{ order.phone }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment & Delivery Method -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-credit-card-2-front-fill text-success"></i> Payment Summary
+            </h5>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Payment Mode:</span>
+              <span class="fw-bold text-dark">{{ order.payment_method }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Payment Status:</span>
+              <span class="badge bg-warning-subtle text-warning-emphasis">{{ order.payment_status }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Order Status:</span>
+              <span class="badge bg-info-subtle text-info-emphasis">{{ order.get_status_display }}</span>
+            </div>
+            <div class="p-2 bg-success-subtle text-success-emphasis rounded-3 small mt-auto">
+              <i class="bi bi-info-circle-fill me-1"></i> Please keep <strong>${{ order.total_amount }}</strong> in cash ready when the courier delivers your package.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Itemized Order Table -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+        <h5 class="fw-bold mb-3 pb-2 border-bottom">Items Ordered</h5>
+
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr class="text-muted small text-uppercase">
+                <th>Product</th>
+                <th class="text-center">Price</th>
+                <th class="text-center">Quantity</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in order.items.all %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      {% if item.product %}
+                        <img src="{{ item.product.get_image_url }}" alt="{{ item.product_name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                        <div>
+                          <a href="{% url 'product_detail' item.product.slug %}" class="fw-bold text-dark text-decoration-none">
+                            {{ item.product_name }}
+                          </a>
+                        </div>
+                      {% else %}
+                        <span class="fw-bold">{{ item.product_name }}</span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="text-center">${{ item.price }}</td>
+                  <td class="text-center">{{ item.quantity }}</td>
+                  <td class="text-end fw-bold">${{ item.get_cost }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="text-end text-muted">Shipping Fee:</td>
+                <td class="text-end fw-bold">
+                  {% if order.shipping_cost == 0 %}
+                    <span class="text-success">FREE</span>
+                  {% else %}
+                    ${{ order.shipping_cost }}
+                  {% endif %}
+                </td>
+              </tr>
+              <tr class="border-top">
+                <td colspan="3" class="text-end fs-5 fw-extrabold text-dark">Grand Total:</td>
+                <td class="text-end fs-5 fw-extrabold text-primary">${{ order.total_amount }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center flex-wrap gap-3">
+        <a href="{% url 'product_list' %}" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold">
+          <i class="bi bi-cart me-1"></i> Continue Shopping
+        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'order_history' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold">
+            <i class="bi bi-box-seam me-1"></i> View Order History
+          </a>
+        {% endif %}
+        <button type="button" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-semibold" onclick="window.print()">
+          <i class="bi bi-printer me-1"></i> Print Receipt
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

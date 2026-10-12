@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us & Customer Support – ShopEasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <div class="text-center mb-5">
+    <span class="text-primary fw-bold text-uppercase small letter-spacing-1">We're Here to Help</span>
+    <h1 class="fw-extrabold display-6">Contact ShopEasy Support</h1>
+    <p class="text-muted max-w-md mx-auto">Have a question about an order, delivery, or product? Our support team is available 24/7.</p>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+    
+    <!-- Contact Details Card -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+        <h4 class="fw-bold mb-4">Store Information</h4>
+
+        <div class="d-flex align-items-start gap-3 mb-4">
+          <div class="perk-icon-box" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-geo-alt-fill"></i>
+          </div>
+          <div>
+            <div class="fw-bold text-dark">Headquarters</div>
+            <div class="text-muted small">100 Tech Park Blvd, Suite 400<br>Silicon Gateway, CA 94016</div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 mb-4">
+          <div class="perk-icon-box" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-telephone-fill"></i>
+          </div>
+          <div>
+            <div class="fw-bold text-dark">Phone Support</div>
+            <div class="text-muted small">+1 (800) 555-EASY<br>Toll-Free 24 Hours a Day</div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 mb-4">
+          <div class="perk-icon-box" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-envelope-fill"></i>
+          </div>
+          <div>
+            <div class="fw-bold text-dark">Email Inquiries</div>
+            <div class="text-muted small">support@shopeasy.com<br>orders@shopeasy.com</div>
+          </div>
+        </div>
+
+        <div class="mt-auto p-3 bg-light rounded-3">
+          <div class="fw-semibold text-dark small mb-1"><i class="bi bi-clock-fill text-primary me-1"></i> Customer Response Time</div>
+          <div class="text-muted small">We reply to all inquiries within 2 hours during active delivery hours.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Contact Form Card -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+        <h4 class="fw-bold mb-3">Send us a Message</h4>
+        <p class="text-muted small mb-4">Fill out the form below and an agent will be in touch shortly.</p>
+
+        <form method="POST" action="{% url 'contact' %}">
+          {% csrf_token %}
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Your Name</label>
+              <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email Address</label>
+              <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Subject</label>
+            <input type="text" name="subject" class="form-control" placeholder="Order inquiry, Product question..." required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Message Details</label>
+            <textarea name="message" rows="4" class="form-control" placeholder="How can we help you today?" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+            <i class="bi bi-send-fill me-2"></i> Send Message
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ShopEasy – Online Shopping Store | Premium Electronics & Tech{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- ==========================================
+       HERO BANNER SECTION
+       ========================================== -->
+  <section class="hero-section">
+    <div class="container px-4 px-lg-5">
+      <div class="row align-items-center g-5">
+        
+        <div class="col-lg-7">
+          <div class="hero-pill-badge">
+            <i class="bi bi-stars text-warning"></i>
+            <span>NEW TECH ARRIVALS &bull; CASH ON DELIVERY</span>
+          </div>
+          <h1 class="hero-title">
+            Upgrade Your Life With <span>Smart Tech</span> & Modern Gear
+          </h1>
+          <p class="hero-subtitle">
+            Discover premier laptops, noise-cancelling headphones, mechanical keyboards, and wearables. Built for performance, designed for comfort.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg px-4 py-3 rounded-pill fw-bold shadow-lg">
+              <i class="bi bi-bag-check-fill me-2"></i> Explore Catalog
+            </a>
+            <a href="#featured" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-semibold">
+              <i class="bi bi-fire text-warning me-2"></i> Featured Deals
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="hero-image-wrapper">
+            <img 
+              src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80" 
+              alt="Wireless Headphones Featured" 
+              class="hero-main-img img-fluid"
+            >
+            <div class="floating-hero-card d-none d-sm-flex">
+              <div class="p-2 bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                <i class="bi bi-patch-check-fill fs-5"></i>
+              </div>
+              <div>
+                <div class="fw-bold fs-6">Cash on Delivery</div>
+                <div class="small text-muted">Pay at doorstep &bull; Zero risk</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FEATURE PERKS ROW
+       ========================================== -->
+  <section class="mb-5">
+    <div class="row g-3 g-md-4">
+      <div class="col-6 col-lg-3">
+        <div class="feature-perk-card h-100">
+          <div class="perk-icon-box">
+            <i class="bi bi-truck"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">Free Delivery</h6>
+            <div class="small text-muted">On orders over $50.00</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="feature-perk-card h-100">
+          <div class="perk-icon-box">
+            <i class="bi bi-cash-stack"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">Cash on Delivery</h6>
+            <div class="small text-muted">Pay when order arrives</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="feature-perk-card h-100">
+          <div class="perk-icon-box">
+            <i class="bi bi-arrow-repeat"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">7-Day Returns</h6>
+            <div class="small text-muted">Hassle-free replacements</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="feature-perk-card h-100">
+          <div class="perk-icon-box">
+            <i class="bi bi-headset"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">24/7 Support</h6>
+            <div class="small text-muted">Dedicated expert team</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SHOP BY CATEGORIES
+       ========================================== -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-primary fw-bold text-uppercase small letter-spacing-1">Browse Collections</span>
+        <h2 class="fw-extrabold fs-3 mb-0">Shop by Category</h2>
+      </div>
+      <a href="{% url 'product_list' %}" class="fw-semibold text-primary text-decoration-none d-flex align-items-center gap-1">
+        View All <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="row g-3 g-md-4">
+      {% for cat in categories %}
+        <div class="col-6 col-md-4 col-lg">
+          <a href="{% url 'product_list_by_category' cat.slug %}" class="category-card">
+            <div class="category-icon-wrapper">
+              <i class="bi {{ cat.icon }}"></i>
+            </div>
+            <div class="category-card-title">{{ cat.name }}</div>
+            <div class="category-card-count">{{ cat.products.count }} products</div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FEATURED PRODUCTS
+       ========================================== -->
+  <section id="featured" class="mb-5 pt-3">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-danger fw-bold text-uppercase small letter-spacing-1"><i class="bi bi-fire me-1"></i> Hot Deals</span>
+        <h2 class="fw-extrabold fs-3 mb-0">Featured Products</h2>
+      </div>
+      <a href="{% url 'product_list' %}?sort=rating" class="fw-semibold text-primary text-decoration-none d-flex align-items-center gap-1">
+        See Top Rated <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for product in featured_products %}
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="product-card">
+            
+            <!-- Badges -->
+            <div class="product-badge-group">
+              {% if product.discount_percentage > 0 %}
+                <span class="badge-sale">-{{ product.discount_percentage }}%</span>
+              {% endif %}
+              <span class="badge-featured">Featured</span>
+            </div>
+
+            <!-- Image Container -->
+            <div class="product-image-container">
+              <a href="{% url 'product_detail' product.slug %}">
+                <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="product-card-img" loading="lazy">
+              </a>
+            </div>
+
+            <!-- Card Body -->
+            <div class="product-card-body">
+              <div class="product-category-tag">{{ product.category.name }}</div>
+              
+              <a href="{% url 'product_detail' product.slug %}" class="product-title" title="{{ product.name }}">
+                {{ product.name }}
+              </a>
+
+              <!-- Rating -->
+              <div class="rating-stars">
+                <i class="bi bi-star-fill"></i>
+                <span class="fw-bold text-dark">{{ product.rating }}</span>
+                <span class="rating-count">({{ product.reviews_count }})</span>
+              </div>
+
+              <!-- Price -->
+              <div class="product-price-row">
+                <span class="current-price">${{ product.price }}</span>
+                {% if product.old_price %}
+                  <span class="old-price">${{ product.old_price }}</span>
+                {% endif %}
+              </div>
+
+              <!-- Stock Indicator -->
+              <div class="stock-indicator">
+                {% if product.is_in_stock %}
+                  <span class="in-stock"><i class="bi bi-check-circle-fill"></i> In Stock ({{ product.stock }})</span>
+                {% else %}
+                  <span class="out-of-stock"><i class="bi bi-x-circle-fill"></i> Out of Stock</span>
+                {% endif %}
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="product-actions-group">
+                {% if product.is_in_stock %}
+                  <form action="{% url 'cart_add' product.id %}" method="POST" class="ajax-add-to-cart flex-grow-1">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn-add-to-cart w-100">
+                      <i class="bi bi-cart-plus"></i> Add to Cart
+                    </button>
+                  </form>
+                {% else %}
+                  <button type="button" class="btn-add-to-cart w-100" disabled>
+                    Out of Stock
+                  </button>
+                {% endif %}
+
+                <a href="{% url 'product_detail' product.slug %}" class="btn-view-details" title="View details">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ==========================================
+       PROMO BANNER CALLOUT
+       ========================================== -->
+  <section class="mb-5">
+    <div class="p-4 p-md-5 rounded-4 bg-primary text-white position-relative overflow-hidden shadow-lg" style="background: linear-gradient(135deg, #1e40af, #3b82f6) !important;">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <span class="badge bg-white text-primary fw-bold px-3 py-2 rounded-pill mb-3">Limited Time Promotion</span>
+          <h2 class="display-6 fw-bold mb-3">Build Your Ultimate Work & Gaming Station</h2>
+          <p class="fs-5 text-white-50 mb-4 pe-lg-5">
+            Discover mechanical keyboards, precision mice, and ergonomic aluminum laptop stands. Premium build, instant response, and seamless Cash on Delivery checkout.
+          </p>
+          <a href="{% url 'product_list' %}" class="btn btn-light text-primary btn-lg rounded-pill fw-bold px-4">
+            Shop Accessories Now &rarr;
+          </a>
+        </div>
+        <div class="col-lg-4 text-center mt-4 mt-lg-0">
+          <i class="bi bi-laptop-fill text-white opacity-25" style="font-size: 11rem; line-height: 0.8;"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       LATEST ARRIVALS
+       ========================================== -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-primary fw-bold text-uppercase small letter-spacing-1">Fresh In Store</span>
+        <h2 class="fw-extrabold fs-3 mb-0">Latest Arrivals</h2>
+      </div>
+      <a href="{% url 'product_list' %}" class="fw-semibold text-primary text-decoration-none d-flex align-items-center gap-1">
+        Browse All Products <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for product in latest_products|slice:":4" %}
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="product-card">
+            
+            <div class="product-badge-group">
+              <span class="badge bg-primary text-white fw-bold">NEW</span>
+            </div>
+
+            <div class="product-image-container">
+              <a href="{% url 'product_detail' product.slug %}">
+                <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="product-card-img" loading="lazy">
+              </a>
+            </div>
+
+            <div class="product-card-body">
+              <div class="product-category-tag">{{ product.category.name }}</div>
+              
+              <a href="{% url 'product_detail' product.slug %}" class="product-title" title="{{ product.name }}">
+                {{ product.name }}
+              </a>
+
+              <div class="rating-stars">
+                <i class="bi bi-star-fill"></i>
+                <span class="fw-bold text-dark">{{ product.rating }}</span>
+                <span class="rating-count">({{ product.reviews_count }})</span>
+              </div>
+
+              <div class="product-price-row">
+                <span class="current-price">${{ product.price }}</span>
+                {% if product.old_price %}
+                  <span class="old-price">${{ product.old_price }}</span>
+                {% endif %}
+              </div>
+
+              <div class="stock-indicator">
+                {% if product.is_in_stock %}
+                  <span class="in-stock"><i class="bi bi-check-circle-fill"></i> In Stock ({{ product.stock }})</span>
+                {% else %}
+                  <span class="out-of-stock"><i class="bi bi-x-circle-fill"></i> Out of Stock</span>
+                {% endif %}
+              </div>
+
+              <div class="product-actions-group">
+                {% if product.is_in_stock %}
+                  <form action="{% url 'cart_add' product.id %}" method="POST" class="ajax-add-to-cart flex-grow-1">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn-add-to-cart w-100">
+                      <i class="bi bi-cart-plus"></i> Add to Cart
+                    </button>
+                  </form>
+                {% else %}
+                  <button type="button" class="btn-add-to-cart w-100" disabled>
+                    Out of Stock
+                  </button>
+                {% endif %}
+
+                <a href="{% url 'product_detail' product.slug %}" class="btn-view-details" title="View details">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

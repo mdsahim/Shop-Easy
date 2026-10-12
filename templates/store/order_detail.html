@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_number }} Details – ShopEasy{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'order_history' %}">My Orders</a></li>
+      <li class="breadcrumb-item active" aria-current="page">#{{ order.order_number }}</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+      <h2 class="fw-extrabold mb-1">Order #{{ order.order_number }}</h2>
+      <div class="text-muted small">Placed on {{ order.created_at|date:"F d, Y" }} at {{ order.created_at|time:"H:i" }} UTC</div>
+    </div>
+    
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge 
+        {% if order.status == 'DELIVERED' %}bg-success
+        {% elif order.status == 'SHIPPED' %}bg-primary
+        {% elif order.status == 'CANCELLED' %}bg-danger
+        {% else %}bg-warning text-dark{% endif %} 
+        fs-6 px-3 py-2 rounded-pill">
+        {{ order.get_status_display }}
+      </span>
+      <button type="button" class="btn btn-outline-secondary rounded-pill px-3" onclick="window.print()">
+        <i class="bi bi-printer me-1"></i> Print
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    
+    <!-- Delivery Address Card -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="bi bi-geo-alt-fill text-danger"></i> Shipping Details
+        </h5>
+        <div class="fw-bold text-dark">{{ order.full_name }}</div>
+        <div class="text-secondary mb-1">{{ order.address }}</div>
+        <div class="text-secondary mb-3">{{ order.city }}, {{ order.state }} - {{ order.postal_code }}</div>
+        <div class="small text-muted pt-2 border-top">
+          <div><i class="bi bi-envelope me-1"></i> {{ order.email }}</div>
+          <div><i class="bi bi-telephone me-1"></i> {{ order.phone }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment info card -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="bi bi-cash-stack text-success"></i> Payment Details
+        </h5>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Payment Method:</span>
+          <span class="fw-bold text-dark">{{ order.payment_method }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Payment Status:</span>
+          <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ order.payment_status }}</span>
+        </div>
+        <div class="p-3 bg-light rounded-3 small mt-3">
+          <i class="bi bi-info-circle text-primary me-1"></i> Pay exactly <strong>${{ order.total_amount }}</strong> in cash upon courier delivery.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Ordered Items Table -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+    <h5 class="fw-bold mb-3 pb-2 border-bottom">Items in this Order</h5>
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr class="small text-muted text-uppercase">
+            <th>Product</th>
+            <th class="text-center">Price</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-end">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  {% if item.product %}
+                    <img src="{{ item.product.get_image_url }}" alt="{{ item.product_name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                    <div>
+                      <a href="{% url 'product_detail' item.product.slug %}" class="fw-bold text-dark text-decoration-none">
+                        {{ item.product_name }}
+                      </a>
+                    </div>
+                  {% else %}
+                    <span class="fw-bold">{{ item.product_name }}</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="text-center">${{ item.price }}</td>
+              <td class="text-center">{{ item.quantity }}</td>
+              <td class="text-end fw-bold">${{ item.get_cost }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="text-end text-muted">Shipping:</td>
+            <td class="text-end fw-bold">
+              {% if order.shipping_cost == 0 %}
+                <span class="text-success">FREE</span>
+              {% else %}
+                ${{ order.shipping_cost }}
+              {% endif %}
+            </td>
+          </tr>
+          <tr class="border-top">
+            <td colspan="3" class="text-end fs-5 fw-extrabold text-dark">Order Total:</td>
+            <td class="text-end fs-5 fw-extrabold text-primary">${{ order.total_amount }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center">
+    <a href="{% url 'order_history' %}" class="btn btn-outline-secondary rounded-pill px-4">
+      &larr; Back to Orders
+    </a>
+    <a href="{% url 'product_list' %}" class="btn btn-primary rounded-pill px-4">
+      Shop More Products
+    </a>
+  </div>
+
+</div>
+{% endblock %}

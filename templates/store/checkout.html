@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout – ShopEasy{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <h2 class="fw-extrabold mb-4 d-flex align-items-center gap-2">
+    <i class="bi bi-shield-lock text-primary"></i> Secure Checkout
+  </h2>
+
+  <div class="row g-4">
+    
+    <!-- Checkout Form Column -->
+    <div class="col-lg-7">
+      <div class="checkout-card mb-4">
+        
+        <h4 class="fw-bold mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+          <i class="bi bi-geo-alt-fill text-danger"></i> Shipping & Delivery Information
+        </h4>
+
+        {% if not user.is_authenticated %}
+          <div class="alert alert-info rounded-3 py-2 px-3 small d-flex justify-content-between align-items-center mb-4">
+            <span>Already have an account? Log in for quick checkout.</span>
+            <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-sm btn-primary rounded-pill px-3">Log In</a>
+          </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'checkout' %}" id="checkoutForm" novalidate>
+          {% csrf_token %}
+
+          <!-- Full Name -->
+          <div class="mb-3">
+            <label for="{{ form.full_name.id_for_label }}" class="form-label">
+              Full Name <span class="text-danger">*</span>
+            </label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}
+              <div class="text-danger small mt-1">{{ form.full_name.errors|first }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Email & Phone -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="{{ form.email.id_for_label }}" class="form-label">
+                Email Address <span class="text-danger">*</span>
+              </label>
+              {{ form.email }}
+              <div class="form-text small">Order confirmation will be sent here.</div>
+              {% if form.email.errors %}
+                <div class="text-danger small mt-1">{{ form.email.errors|first }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.phone.id_for_label }}" class="form-label">
+                Phone Number <span class="text-danger">*</span>
+              </label>
+              {{ form.phone }}
+              <div class="form-text small">Used for courier delivery updates.</div>
+              {% if form.phone.errors %}
+                <div class="text-danger small mt-1">{{ form.phone.errors|first }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="mb-3">
+            <label for="{{ form.address.id_for_label }}" class="form-label">
+              Delivery Address (Street, House/Flat, Landmark) <span class="text-danger">*</span>
+            </label>
+            {{ form.address }}
+            {% if form.address.errors %}
+              <div class="text-danger small mt-1">{{ form.address.errors|first }}</div>
+            {% endif %}
+          </div>
+
+          <!-- City, State, PIN -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label for="{{ form.city.id_for_label }}" class="form-label">
+                City <span class="text-danger">*</span>
+              </label>
+              {{ form.city }}
+              {% if form.city.errors %}
+                <div class="text-danger small mt-1">{{ form.city.errors|first }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label for="{{ form.state.id_for_label }}" class="form-label">
+                State / Province <span class="text-danger">*</span>
+              </label>
+              {{ form.state }}
+              {% if form.state.errors %}
+                <div class="text-danger small mt-1">{{ form.state.errors|first }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label for="{{ form.postal_code.id_for_label }}" class="form-label">
+                PIN / Postal Code <span class="text-danger">*</span>
+              </label>
+              {{ form.postal_code }}
+              {% if form.postal_code.errors %}
+                <div class="text-danger small mt-1">{{ form.postal_code.errors|first }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Payment Method Section -->
+          <h5 class="fw-bold mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+            <i class="bi bi-wallet2 text-success"></i> Payment Method
+          </h5>
+
+          <div class="cod-banner-box mb-4">
+            <div class="form-check m-0">
+              <input class="form-check-input" type="radio" name="payment_method" id="codPaymentRadio" value="COD" checked>
+              <label class="form-check-label fw-bold fs-6 text-dark" for="codPaymentRadio">
+                Cash on Delivery (COD)
+              </label>
+              <p class="small text-muted mb-0 mt-1">
+                Pay in cash directly to the delivery person upon receiving your package at your doorstep. Safe, reliable, and verified.
+              </p>
+            </div>
+          </div>
+
+          <!-- Place Order Button -->
+          <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow" id="btnPlaceOrder">
+            <i class="bi bi-bag-check-fill me-2"></i> Place Order (Cash on Delivery)
+          </button>
+
+          <p class="text-center text-muted small mt-2 mb-0">
+            By placing your order, you agree to ShopEasy's Terms of Service and Return Policy.
+          </p>
+
+        </form>
+
+      </div>
+    </div>
+
+    <!-- Order Review Summary Column -->
+    <div class="col-lg-5">
+      <div class="order-summary-card">
+        
+        <h5 class="fw-bold mb-3 pb-2 border-bottom d-flex justify-content-between align-items-center">
+          <span>Order Summary</span>
+          <span class="badge bg-primary rounded-pill">{{ cart_item_count }} items</span>
+        </h5>
+
+        <!-- Itemized cart review -->
+        <div class="checkout-items-list mb-3" style="max-height: 280px; overflow-y: auto;">
+          {% for item in cart %}
+            <div class="d-flex align-items-center justify-content-between gap-3 py-2 border-bottom">
+              <div class="d-flex align-items-center gap-2">
+                <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}" class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
+                <div>
+                  <div class="fw-semibold small text-truncate" style="max-width: 180px;">{{ item.product.name }}</div>
+                  <div class="text-muted small">Qty: {{ item.quantity }} &times; ${{ item.price }}</div>
+                </div>
+              </div>
+              <div class="fw-bold small text-nowrap">${{ item.total_price }}</div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span class="fw-bold text-dark">${{ cart.get_subtotal }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Shipping Fee</span>
+          <span class="fw-bold text-dark">
+            {% if cart.get_shipping_cost == 0 %}
+              <span class="text-success">FREE</span>
+            {% else %}
+              ${{ cart.get_shipping_cost }}
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="summary-row">
+          <span>Taxes</span>
+          <span class="text-muted">Included</span>
+        </div>
+
+        <div class="summary-row total-row">
+          <span>Total Amount</span>
+          <span class="text-primary">${{ cart.get_total_price }}</span>
+        </div>
+
+        <!-- Trust Guarantees -->
+        <div class="mt-4 pt-3 border-top text-muted small">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-shield-check text-success fs-5"></i>
+            <span>Verified Server Prices (tamper-proof)</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-box-seam text-primary fs-5"></i>
+            <span>Live Stock Reservation on Checkout</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-truck text-warning fs-5"></i>
+            <span>Estimated Delivery in 2 - 4 Business Days</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
