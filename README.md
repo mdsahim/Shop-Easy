@@ -251,3 +251,5 @@ e-commerace website pr 1/
 
 ## 📄 License
 This project is open-source and free to use for personal, educational, or commercial purposes.
+#   S h o p - E a s y  
+ 
